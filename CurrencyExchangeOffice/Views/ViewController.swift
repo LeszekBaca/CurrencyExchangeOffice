@@ -19,13 +19,16 @@ let urlString = "https://api.coinbase.com/v2/currencies"
         
         myLabel = UILabel()
         myLabel.text = "Hello"
-        myLabel.font = UIFont.systemFont(ofSize: 36)
-        myLabel.sizeToFit()
         
         view.addSubview(myLabel)
         
+        myLabel.translatesAutoresizingMaskIntoConstraints = false
+        myLabel
+            .centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        myLabel
+            .centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+        myLabel.font = UIFont.systemFont(ofSize: 36)
         
-        //myLabel.text = "Hello"
         
         fetchData(from: urlString) { result in
             switch result {
@@ -35,8 +38,6 @@ let urlString = "https://api.coinbase.com/v2/currencies"
                 print("Error: \(error.localizedDescription)")
             }
         }
-        
     }
-    
 }
 

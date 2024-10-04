@@ -13,31 +13,31 @@ func fetchData(from urlString: String, completion: @escaping(Result<MainModel, E
         completion(.failure("Invalid URL" as! Error))
         return
     }
-    
-    //Creating URLSession
-    let task = URLSession.shared.dataTask(with: url, completionHandler: {
-    //let task = URLSession.shared.dataTask(with: url,
-        data, response, error in
-        
+//URLSession.shared.dataTask(with: <#T##URLRequest#>, completionHandler: <#T##(Data?, URLResponse?, (any Error)?) -> Void#>)
+
+
+let completionHandler: ((Data?, URLResponse?, (any Error)?) -> Void) = {
+    data, response, error in
         if let error = error {
-            completion(.failure(error))
-            return
+          completion(.failure(error))
+          return
         }
-        
         // Check if the answer is correct and the data is available
         guard let data = data, let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-            completion(.failure("Invalid response or data" as! Error))
-            return
+          completion(.failure("Invalid response or data" as! Error))
+          return
         }
-        
         do {
-            let decoder = JSONDecoder()
-            let dataModel = try decoder.decode(MainModel.self, from: data)
-            completion(.success(dataModel))
+          let decoder = JSONDecoder()
+          let dataModel = try decoder.decode(MainModel.self, from: data)
+          completion(.success(dataModel))
         } catch {
-            completion(.failure(error))
+          completion(.failure(error))
         }
-    })
+}
+    
+    //Creating URLSession
+    let task = URLSession.shared.dataTask(with: url, completionHandler: completionHandler)
     task.resume()
     
 }
