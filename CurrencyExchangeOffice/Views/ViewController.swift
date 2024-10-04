@@ -29,26 +29,26 @@ class ViewController: UIViewController {
             .centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
         myLabel.font = UIFont.systemFont(ofSize: 36)
         
-//        fetchData(from: urlString) { result in
-//            switch result {
-//            case .success(let data):
-//                print(data.data.count)
-//            case .failure(let error):
-//                print("Error: \(error.localizedDescription)")
-//            }
-//        }
-//        
+        //        fetchData(from: urlString) { result in
+        //            switch result {
+        //            case .success(let data):
+        //                print(data.data.count)
+        //            case .failure(let error):
+        //                print("Error: \(error.localizedDescription)")
+        //            }
+        //        }
+        //
         
         fetchData(from: urlString) { result in
-                    DispatchQueue.main.async {
-                        switch result {
-                        case .success(let dataModel):
-                            self.myLabel.text = "Count: \(dataModel.data.count)"
-                        case .failure(let error):
-                            self.myLabel.text = "Error: \(error.localizedDescription)"
-                        }
-                    }
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let dataModel):
+                    self.myLabel.text = "Count: \(dataModel.data.count)"
+                case .failure(let error):
+                    self.myLabel.text = "Error: \(error.localizedDescription)"
                 }
+            }
+        }
     }
 }
 
