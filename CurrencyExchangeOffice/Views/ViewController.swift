@@ -54,18 +54,19 @@ class ViewController: UIViewController {
       }
     }
   }
-  var ViewController: UITableViewDataSource{
+  var ViewController: UITableViewDataSource {
+      
     func tableView(_ tableView: UITableView, numberOfRowsInComponent component: Int) -> Int {
       return dataModels.count // Number of currencies
     }
-    func tableView(_ pickerView: UITableView, didSelectRow row: Int) -> UITableViewCell {
+      func tableView(_ tableView: UITableView, didSelectRow row: Int) -> UITableViewCell {
       let storyboard = UIStoryboard(name: "Main", bundle: nil)
       let vc = storyboard.instantiateViewController(withIdentifier: "testVC")
       vc.navigationItem.title = dataModels[row].name
       navigationController?.pushViewController(vc, animated: true)
       let selectedCurrency = dataModels[row]
       //myLabel.text = "ID: \(selectedCurrency.id), Min Size: \(selectedCurrency.min_size)"
-      let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: row)
+      let cell = tableView.dequeueReusableCell(withIdentifier: "cell")!
       cell.textLabel?.text = dataModels[row].name
       //cell.selectionStyle = .none
       return cell
