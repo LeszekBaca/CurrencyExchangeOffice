@@ -5,17 +5,20 @@
 // Created by Leszek Baca on 06/09/2024.
 //
 import UIKit
-//class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSource {
-class ViewController: UIViewController {
-    //@IBOutlet var picker: UIPickerView!
-    weak var tableView: UITableView!
+
+final class ViewController: UIViewController {
+    // @IBOutlet var picker: UIPickerView!
+    var tableView: UITableView!
     let urlString = "https://api.coinbase.com/v2/currencies"
     var dataModels: [DataModel] = []
     var myLabel: UILabel!
-    var pickerView: UIPickerView!
+
+    // MARK: - View lifecycle
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
     }
+
     override func viewDidLoad() {
         super.viewDidLoad()
         myLabel = UILabel()
@@ -26,80 +29,103 @@ class ViewController: UIViewController {
         myLabel
             .centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
         myLabel.font = UIFont.systemFont(ofSize: 36)
-        //uitableview lub colectonview
-        //prezentacja nowego view controlera
-        //obsluga bledow sieciowych i nie tylko
-        //testy jednostkowy sprawdzajacy mapowanie jesona ()
-        //budowanie widoku z storyboard (autolayout uistackview uiimage)
-        // Initialization UIPickerView
-        //    pickerView = UIPickerView()
-        //    pickerView.delegate = self
-        //    pickerView.dataSource = self
-        //    pickerView.translatesAutoresizingMaskIntoConstraints = false
-        //    view.addSubview(pickerView)
-        // Setting restrictions
-        //    pickerView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        //    pickerView.topAnchor.constraint(equalTo: myLabel.bottomAnchor, constant: 20).isActive = true
-        //    pickerView.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
-        fetchData(from: urlString) { result in
+
+        tableView = UITableView()
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        tableView.register(CustomTableViewCell.self, forCellReuseIdentifier: "CustomTableViewCell")
+        view.addSubview(tableView)
+        NSLayoutConstraint.activate([
+            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            tableView.topAnchor.constraint(equalTo: view.topAnchor),
+            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+        ])
+        tableView.dataSource = self
+        tableView.delegate = self
+
+        fetchData(from: urlString) {
+            [weak self]
+            result in
             DispatchQueue.main.async {
                 switch result {
-                case .success(let dataModel):
-                    self.dataModels = dataModel.data
+                case let .success(dataModel):
+                    self?.dataModels = dataModel.data
                     // self.pickerView.reloadAllComponents()
-                    self.myLabel.text = "Liczba walut: \(dataModel.data.count)"
-                case .failure(let error):
-                    self.myLabel.text = "Error: \(error.localizedDescription)"
+                    self?.tableView.reloadData()
+                    self?.myLabel.text = "Liczba walut: \(dataModel.data.count)"
+                case let .failure(error):
+                    self?.myLabel.text = "Error: \(error.localizedDescription)"
                 }
             }
         }
     }
-    
-    var ViewController: UITableViewDataSource {
-        
-        func tableView(_ tableView: UITableView, numberOfRowsInComponent component: Int) -> Int {
-            return dataModels.count // Number of currencies
-        }
-        
-        func pickerView(_ tableView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-            return dataModels[row].name // Display currency name
-        }
-        
-        func tableView(_ tableView: UITableView, didSelectRow row: Int) -> UITableViewCell {
-            let storyboard = UIStoryboard(name: "Main", bundle: nil)
-            let vc = storyboard.instantiateViewController(withIdentifier: "testVC")
-            vc.navigationItem.title = dataModels[row].name
-            navigationController?.pushViewController(vc, animated: true)
-            
-            let selectedCurrency = dataModels[row]
-            //myLabel.text = "ID: \(selectedCurrency.id), Min Size: \(selectedCurrency.min_size)"
-            let cell = tableView.dequeueReusableCell(withIdentifier: "cell")!
-            cell.textLabel?.text = dataModels[row].name
-            //cell.selectionStyle = .none
-            return cell
-        }
-        return self.ViewController
+
+}
+
+extension ViewController: UITableViewDelegate {
+    func tableView(_: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        let vc = storyboard.instantiateViewController(withIdentifier: "testVC")
+        vc.navigationItem.title = dataModels[indexPath.row].name
+        navigationController?.pushViewController(vc, animated: true)
     }
-    
-    
-    //  func numberOfComponents(in pickerView: UIPickerView) -> Int {
-    //    return 1 // Number of columns
-    //  }
-    //
-    //  func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-    //    return dataModels.count // Number of currencies
-    //  }
-    //
-    //  func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-    //    return dataModels[row].name // Display currency name
-    //  }
-    //  func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-    //    let storyboard = UIStoryboard(name: "Main", bundle: nil)
-    //    let vc = storyboard.instantiateViewController(withIdentifier: "testVC")
-    //    vc.navigationItem.title = dataModels[row].name
-    //    navigationController?.pushViewController(vc, animated: true)
-    //
-    //    let selectedCurrency = dataModels[row]
-    //    myLabel.text = "ID: \(selectedCurrency.id), Min Size: \(selectedCurrency.min_size)"
-    //  }
+
+    func tableView(_: UITableView, heightForRowAt _: IndexPath) -> CGFloat {
+        return 50
+    }
+}
+
+extension ViewController: UITableViewDataSource {
+    func numberOfSections(in _: UITableView) -> Int {
+        return 1
+    }
+
+    func tableView(_: UITableView, numberOfRowsInSection _: Int) -> Int {
+        return dataModels.count
+    }
+
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let selectedCurrency = dataModels[indexPath.row]
+        // myLabel.text = "ID: \(selectedCurrency.id), Min Size: \(selectedCurrency.min_size)"
+        let cell = tableView.dequeueReusableCell(withIdentifier: "CustomTableViewCell", for: indexPath) as! CustomTableViewCell
+        cell.textLabel?.text = selectedCurrency.name
+        // cell.selectionStyle = .none
+        return cell
+    }
+}
+
+final class CustomTableViewCell: UITableViewCell {
+    let customLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        return label
+    }()
+
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        setupCell()
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        setupCell()
+    }
+
+    private func setupCell() {
+        // Add customLabel to the contentView
+        contentView.addSubview(customLabel)
+
+        // Set up constraints for the label
+        NSLayoutConstraint.activate([
+            customLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            customLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            customLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+        ])
+    }
+
+    // Configure the cell with data
+    func configure(with text: String) {
+        customLabel.text = text
+    }
 }
