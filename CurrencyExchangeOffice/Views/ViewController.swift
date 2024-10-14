@@ -64,6 +64,7 @@ class ViewController: UIViewController {
       let vc = storyboard.instantiateViewController(withIdentifier: "testVC")
       vc.navigationItem.title = dataModels[row].name
       navigationController?.pushViewController(vc, animated: true)
+          
       let selectedCurrency = dataModels[row]
       //myLabel.text = "ID: \(selectedCurrency.id), Min Size: \(selectedCurrency.min_size)"
       let cell = tableView.dequeueReusableCell(withIdentifier: "cell")!
@@ -71,6 +72,7 @@ class ViewController: UIViewController {
       //cell.selectionStyle = .none
       return cell
     }
+      return self.ViewController
   }
   //  func numberOfComponents(in pickerView: UIPickerView) -> Int {
   //    return 1 // Number of columns
